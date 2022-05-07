@@ -1,0 +1,49 @@
+display_information:
+  name: Dr. Crane
+  description: I'm listening...
+  background_color: "#15001f"
+  long_description: Dr. Frasier Winslow Crane is a fictional character on the American television sitcom Cheers and its spin-off Frasier, portrayed by Kelsey Grammer incarnated as slack wellness spam bot.
+features:
+  app_home:
+    home_tab_enabled: true
+    messages_tab_enabled: true
+    messages_tab_read_only_enabled: false
+  bot_user:
+    display_name: Dr. Crane
+    always_online: true
+  slash_commands:
+    - command: /checkin
+      url: https://dan.ventureharbour.ngrok.io/events
+      description: Do a weekly wellness checkin
+      should_escape: false
+    - command: /advice
+      url: https://dan.ventureharbour.ngrok.io/events
+      description: Get some advice from Dr. Crane
+      should_escape: false
+oauth_config:
+  redirect_urls:
+    - https://dan.ventureharbour.ngrok.io/auth/redirect
+  scopes:
+    bot:
+      - app_mentions:read
+      - chat:write
+      - im:history
+      - im:read
+      - im:write
+      - users:read
+      - channels:read
+      - incoming-webhook
+      - commands
+settings:
+  event_subscriptions:
+    request_url: https://dan.ventureharbour.ngrok.io/events
+    bot_events:
+      - app_home_opened
+      - app_mention
+      - message.im
+  interactivity:
+    is_enabled: true
+    request_url: https://dan.ventureharbour.ngrok.io/events
+  org_deploy_enabled: false
+  socket_mode_enabled: false
+  token_rotation_enabled: false

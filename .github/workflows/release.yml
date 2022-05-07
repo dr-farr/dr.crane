@@ -1,0 +1,55 @@
+name: release
+on: [push, workflow_dispatch]
+jobs:
+  env:
+    name: 📩 env
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: "Generate .env"
+        env:
+          SLACK_CLIENT_ID: ${{ secrets.SLACK_CLIENT_ID }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_CLIENT_SECRET: ${{ secrets.SLACK_CLIENT_SECRET }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+          GOOGLE_CLIENT_EMAIL: ${{ secrets.GOOGLE_CLIENT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+
+        run: |
+          echo "SLACK_CLIENT_ID=$SLACK_CLIENT_ID" >> .env
+          echo "SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL" >> .env
+          echo "SLACK_CLIENT_SECRET=$SLACK_CLIENT_SECRET" >> .env
+          echo "SLACK_BOT_TOKEN=$SLACK_BOT_TOKEN" >> .env
+          echo "SLACK_SIGNING_SECRET=$SLACK_SIGNING_SECRET" >> .env
+          echo "GOOGLE_CLIENT_EMAIL=$GOOGLE_CLIENT_EMAIL" >> .env
+          echo "GOOGLE_PRIVATE_KEY=$GOOGLE_PRIVATE_KEY" >> .env
+          echo "GOOGLE_SHEET_ID=$GOOGLE_SHEET_ID" >> .env
+
+      - name: "Upload .env"
+        uses: actions/upload-artifact@v3
+        with:
+          name: env
+          path: .env
+
+  fly:
+    name: 🎈 Release
+    runs-on: ubuntu-20.04
+    needs:
+      - env
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+      FLY_REGION: lhr
+    steps:
+      - uses: actions/checkout@v2
+        name: "Checkout repo"
+      - name: "Download .env"
+        uses: actions/download-artifact@v3
+        with:
+          name: env
+      - uses: superfly/flyctl-actions@master
+        name: "Deploy to fly"
+        with:
+          args: |
+            deploy --region lhr --no-cache
